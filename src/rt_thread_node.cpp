@@ -1,6 +1,11 @@
 #include "ros/ros.h"
 #include "std_msgs/String.h"
+#include "std_msgs/Int8.h"
+#include "geometry_msgs/Twist.h"
 
+
+#include "can_test/can.h"
+#include "can_test/motor_driver.h"
 
 
 #include<sys/mman.h>
@@ -28,7 +33,7 @@
 unsigned int cycle_ns = 1000000; //Control Cycle 1[ms]
 
 //loop flag(thread)
-bool kudos_run = true;
+bool CAN_run = true;
 
 //Xenomai time variables
 RT_TASK RT_task1;
@@ -39,7 +44,7 @@ double max_time = 0.0;
 
 /***********************************/
 /************function***************/
-void kudos_task(void* arg);
+void CAN_task(void* arg);
 
 void delay(clock_t n);
 
@@ -49,11 +54,12 @@ int main(int argc, char **argv)
   ros::NodeHandle nh;
 
   ros::Publisher chatter_pub = nh.advertise<std_msgs::String>("chatter", 1000);
+  ros::Subscriber cmd_vel_sub = nh.subscribe("/cmd_vel", 1000, cmd_velCallback);
 
-  rt_task_create(&RT_task1,"KUDOS_tesk",0,90,0);
-  printf("thread_created..\n");
-  rt_task_start(&RT_task1,&kudos_task,NULL);
-  printf("thread_started..\n");
+  rt_task_create(&RT_task1,"CAN_tesk",0,90,0);
+  ROS_INFO("thread_created..\n");
+  rt_task_start(&RT_task1,&CAN_task,NULL);
+  ROS_INFO("thread_started..\n");
 
   //Thread Setting End
 
@@ -69,22 +75,26 @@ int main(int argc, char **argv)
 
     loop_rate.sleep();
   }
-  kudos_run = false;
+  CAN_run = false;
   return 0;
 }
 
 
-void kudos_task(void* arg){
+void CAN_task(void* arg){
 
   unsigned int count=0;
-  rt_task_set_periodic(NULL, TM_NOW, cycle_ns*1);
+  rt_task_set_periodic(NULL, TM_NOW, cycle_ns*10);  //10ms
 
-  while (kudos_run){
+  static struct Encoder_data enc_data;
+  Encoder_REQ();
+
+  while (CAN_run){
 
     rt_task_wait_period(NULL);
-    printf("%d\n",count);
-    count++;
-    delay(1000);
+
+    enc_data = read_Encoder();
+    ROS_INFO("R_posi : %d   L_posi : %d",enc_data.R_posi,enc_data.L_posi);
+    Encoder_REQ();
   }
 
 

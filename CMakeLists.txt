@@ -14,7 +14,7 @@ SET (SRC_FILES
 ## if COMPONENTS list like find_package(catkin REQUIRED COMPONENTS xyz)
 ## is used, also find other catkin packages
 find_package(catkin REQUIRED COMPONENTS
-  roscpp std_msgs
+  roscpp std_msgs geometry_msgs can_test
 )
 
 ## System dependencies are found with CMake's conventions
@@ -109,7 +109,7 @@ find_package(catkin REQUIRED COMPONENTS
 catkin_package(
 #  INCLUDE_DIRS include
   LIBRARIES rt_thread
-  CATKIN_DEPENDS roscpp std_msgs
+  CATKIN_DEPENDS roscpp std_msgs geometry_msgs can_test
   DEPENDS system_lib
 )
 
