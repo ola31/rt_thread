@@ -1,27 +1,6 @@
-#include "ros/ros.h"
-#include "std_msgs/String.h"
+#include "rt_thread/rt_thread.h"
 
 
-
-#include<sys/mman.h>
-#include <signal.h>
-#include <unistd.h>
-#include <time.h>
-#include <iostream>
-#include <sys/time.h>
-#include <stdio.h>
-#include <pthread.h>
-#include <inttypes.h>
-
-
-/************xenomai**************/
-
-#include <alchemy/task.h>
-#include <alchemy/timer.h>
-#include <alchemy/mutex.h>
-#include <alchemy/sem.h>
-#include <boilerplate/trace.h>
-#include <xenomai/init.h>
 
 #define NSEC_PER_SEC 1000000000
 
@@ -57,7 +36,7 @@ int main(int argc, char **argv)
 
   //Thread Setting End
 
-  ros::Rate loop_rate(10);
+  ros::Rate loop_rate(100);  //100hz = 10ms
   while (ros::ok())
   {
     std_msgs::String msg;
@@ -77,14 +56,13 @@ int main(int argc, char **argv)
 void kudos_task(void* arg){
 
   unsigned int count=0;
-  rt_task_set_periodic(NULL, TM_NOW, cycle_ns*1);
+  rt_task_set_periodic(NULL, TM_NOW, cycle_ns*10);  //10ms
 
   while (kudos_run){
 
     rt_task_wait_period(NULL);
     printf("%d\n",count);
     count++;
-    delay(1000);
   }
 
 

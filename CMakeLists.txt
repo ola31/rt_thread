@@ -3,7 +3,8 @@ project(rt_thread)
 
 
 SET (SRC_FILES
-    src/rt_thread_node.cpp
+    src/rt_thread.cpp
+    src/rt_thread_bringup.cpp
     )
 
 
@@ -14,7 +15,11 @@ SET (SRC_FILES
 ## if COMPONENTS list like find_package(catkin REQUIRED COMPONENTS xyz)
 ## is used, also find other catkin packages
 find_package(catkin REQUIRED COMPONENTS
-  roscpp std_msgs
+  roscpp
+  std_msgs
+  geometry_msgs
+  can_test
+  message_generation
 )
 
 ## System dependencies are found with CMake's conventions
@@ -51,11 +56,10 @@ find_package(catkin REQUIRED COMPONENTS
 ##   * add every package in MSG_DEP_SET to generate_messages(DEPENDENCIES ...)
 
 ## Generate messages in the 'msg' folder
-# add_message_files(
-#   FILES
-#   Message1.msg
-#   Message2.msg
-# )
+ add_message_files(
+   FILES
+   rpm.msg
+ )
 
 ## Generate services in the 'srv' folder
 # add_service_files(
@@ -72,10 +76,10 @@ find_package(catkin REQUIRED COMPONENTS
 # )
 
 ## Generate added messages and services with any dependencies listed here
-# generate_messages(
-#   DEPENDENCIES
-#   roscpp std_msgs
-# )
+ generate_messages(
+   DEPENDENCIES
+   roscpp std_msgs
+ )
 
 ################################################
 ## Declare ROS dynamic reconfigure parameters ##
@@ -107,9 +111,9 @@ find_package(catkin REQUIRED COMPONENTS
 ## CATKIN_DEPENDS: catkin_packages dependent projects also need
 ## DEPENDS: system dependencies of this project that dependent projects also need
 catkin_package(
-#  INCLUDE_DIRS include
+  INCLUDE_DIRS include
   LIBRARIES rt_thread
-  CATKIN_DEPENDS roscpp std_msgs
+  CATKIN_DEPENDS roscpp std_msgs geometry_msgs
   DEPENDS system_lib
 )
 
@@ -121,7 +125,7 @@ catkin_package(
 ## Specify additional locations of header files
 ## Your package locations should be listed before other locations
 include_directories(
-# include
+ include
   ${catkin_INCLUDE_DIRS}
   /usr/xenomai/include/cobalt
   /usr/xenomai/include
@@ -148,7 +152,8 @@ SET(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${PROJECT_SOURCE_DIR}/bin)
 
 ## Declare a C++ library
 # add_library(${PROJECT_NAME}
-#   src/${PROJECT_NAME}/rt_thread.cpp
+#   src/rt_thread.cpp
+ #  src/rt_thread_bringup.cpp
 # )
 
 ## Add cmake target dependencies of the library
@@ -159,7 +164,7 @@ SET(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${PROJECT_SOURCE_DIR}/bin)
 ## Declare a C++ executable
 ## With catkin_make all packages are built within a single CMake context
 ## The recommended prefix ensures that target names across packages don't collide
- add_executable(${PROJECT_NAME}_node src/rt_thread_node.cpp)
+ add_executable(${PROJECT_NAME}_node src/rt_thread.cpp src/rt_thread_bringup.cpp)
 
 ## Rename C++ executable without prefix
 ## The above recommended prefix causes long target names, the following renames the
@@ -170,6 +175,7 @@ SET(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${PROJECT_SOURCE_DIR}/bin)
 ## Add cmake target dependencies of the executable
 ## same as for the library above
  add_dependencies(${PROJECT_NAME}_node ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
+ add_dependencies(rt_thread rt_thread_generate_messages_cpp)
 
 ## Specify libraries to link a library or executable target against
  target_link_libraries(${PROJECT_NAME}_node
