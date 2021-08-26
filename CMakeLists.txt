@@ -78,7 +78,7 @@ find_package(catkin REQUIRED COMPONENTS
 ## Generate added messages and services with any dependencies listed here
  generate_messages(
    DEPENDENCIES
-   roscpp std_msgs
+   std_msgs
  )
 
 ################################################
@@ -175,7 +175,8 @@ SET(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${PROJECT_SOURCE_DIR}/bin)
 ## Add cmake target dependencies of the executable
 ## same as for the library above
  add_dependencies(${PROJECT_NAME}_node ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
- add_dependencies(rt_thread rt_thread_generate_messages_cpp)
+# add_dependencies(rt_thread rt_thread_generate_messages_cpp)
+
 
 ## Specify libraries to link a library or executable target against
  target_link_libraries(${PROJECT_NAME}_node
