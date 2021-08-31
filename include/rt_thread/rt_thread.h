@@ -101,6 +101,12 @@ class RT_THREAD : public CAN
     void imu_req(void);
     void imu_read(void);
 
+    void angleY_req(void);
+    void angleZ_req(void);
+    void gyroZ_req(void);
+    void imuReadOnce(void);
+
+
 
 
     int Byte2Int32(BYTE d4, BYTE d5, BYTE d6, BYTE d7);

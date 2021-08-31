@@ -296,7 +296,7 @@ void RT_THREAD::imu_req(void){
   imu_req_arr[0] = 0x3c;
 
 
-  for(i=2;i>=2;i--){
+  for(i=2;i>=1;i--){
 
     //i=0 : acc
     //i=1 : gyro
@@ -327,7 +327,7 @@ void RT_THREAD::imu_read(void){
 
   int i=0;
 
-  for(i=0;i<2;i++){
+  for(i=0;i<3;i++){
     imu_can_data = CAN_read();
     if(imu_can_data.data[1]==51){
 
@@ -360,6 +360,69 @@ void RT_THREAD::imu_read(void){
 
   }
   //ROS_INFO("angle x : %f",angle_x);
+}
+
+void RT_THREAD::angleY_req(void){
+  BYTE imu_req_arr[8]={0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00};
+  imu_req_arr[0] = 0x3c;
+  imu_req_arr[1] = (53) & 0xff;    //low data
+  imu_req_arr[2] = (53)>>8 & 0xff; //high data
+  imu_req_arr[3] = 2;
+
+  imu_write(imu_req_arr);
+
+}
+void RT_THREAD::angleZ_req(void){
+  BYTE imu_req_arr[8]={0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00};
+  imu_req_arr[0] = 0x3c;
+  imu_req_arr[1] = (53) & 0xff;    //low data
+  imu_req_arr[2] = (53)>>8 & 0xff; //high data
+  imu_req_arr[3] = 3;
+
+  imu_write(imu_req_arr);
+}
+void RT_THREAD::gyroZ_req(void){
+  BYTE imu_req_arr[8]={0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00};
+  imu_req_arr[0] = 0x3c;
+  imu_req_arr[1] = (52) & 0xff;    //low data
+  imu_req_arr[2] = (52)>>8 & 0xff; //high data
+  imu_req_arr[3] = 3;
+
+  imu_write(imu_req_arr);
+}
+
+void RT_THREAD::imuReadOnce(void){
+  struct CAN_data imu_can_data;
+  imu_can_data = CAN_read();
+  if(imu_can_data.data[1]==51){
+
+    if(imu_can_data.data[3]==1) this->acc_x = Byte2float32(imu_can_data.data[4],imu_can_data.data[5],imu_can_data.data[6],imu_can_data.data[7]);
+    else if(imu_can_data.data[3]==2) this->acc_y = Byte2float32(imu_can_data.data[4],imu_can_data.data[5],imu_can_data.data[6],imu_can_data.data[7]);
+    else if(imu_can_data.data[3]==3) this->acc_z = Byte2float32(imu_can_data.data[4],imu_can_data.data[5],imu_can_data.data[6],imu_can_data.data[7]);
+    else ROS_WARN("Something is wrong (acc_read)");
+
+  }
+
+  else if(imu_can_data.data[1]==52){
+
+    if(imu_can_data.data[3]==1) this->gyro_x = DEG_2_RAD(Byte2float32(imu_can_data.data[4],imu_can_data.data[5],imu_can_data.data[6],imu_can_data.data[7]));
+    else if(imu_can_data.data[3]==2) this->gyro_y = DEG_2_RAD(Byte2float32(imu_can_data.data[4],imu_can_data.data[5],imu_can_data.data[6],imu_can_data.data[7]));
+    else if(imu_can_data.data[3]==3) this->gyro_z = DEG_2_RAD(Byte2float32(imu_can_data.data[4],imu_can_data.data[5],imu_can_data.data[6],imu_can_data.data[7]));
+    else ROS_WARN("Something is wrong (gyro_read)");
+  }
+
+  else if(imu_can_data.data[1]==53){
+    //단위 deg
+    if(imu_can_data.data[3]==1) this->angle_x = Byte2float32(imu_can_data.data[4],imu_can_data.data[5],imu_can_data.data[6],imu_can_data.data[7]);
+    else if(imu_can_data.data[3]==2) this->angle_y = Byte2float32(imu_can_data.data[4],imu_can_data.data[5],imu_can_data.data[6],imu_can_data.data[7]);
+    else if(imu_can_data.data[3]==3) this->angle_z = Byte2float32(imu_can_data.data[4],imu_can_data.data[5],imu_can_data.data[6],imu_can_data.data[7]);
+    else ROS_WARN("Something is wrong (angle_read)");
+
+  }
+  else{
+    ROS_WARN("Something is wrong??");
+  }
+
 }
 
 /***********************************************************

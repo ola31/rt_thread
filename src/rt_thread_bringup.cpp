@@ -45,7 +45,7 @@ void modeCallback(const std_msgs::Int8::ConstPtr& msg){
   else if(operating_mode == 2){}
     //ROS_INFO("Operating Mode : CMD_VEL control mode");
   else if(operating_mode == 0){
-    ROS_INFO("TQ_OFF!!");
+    //ROS_INFO("TQ_OFF!!");
     rt.Torque_OFF();
   }
  else if(operating_mode == 3){
@@ -71,7 +71,7 @@ void cmd_velCallback(const geometry_msgs::Twist::ConstPtr& msg){
   }
 }
 
-void rpmCallback(const md_imu::rpm::ConstPtr& msg){
+void rpmCallback(const rt_thread::rpm::ConstPtr& msg){
 
   if(operating_mode == 1){
     //ROS_INFO("rpmcallback1");
@@ -89,7 +89,7 @@ int main(int argc, char **argv)
   ros::NodeHandle nh;
 
   ros::Publisher chatter_pub = nh.advertise<std_msgs::String>("chatter", 1000);
-  ros::Publisher present_rpm_pub = nh.advertise<md_imu::rpm>("/present_rpm", 1000);
+  ros::Publisher present_rpm_pub = nh.advertise<rt_thread::rpm>("/present_rpm", 1000);
   ros::Publisher led_status_pub = nh.advertise<std_msgs::UInt16>("/md_driver_status", 1000); // to use gui status led
   ros::Subscriber mode_sub = nh.subscribe("/mode", 1000, modeCallback);
   ros::Subscriber cmd_vel_sub = nh.subscribe("/cmd_vel", 1000, cmd_velCallback);
@@ -101,14 +101,9 @@ int main(int argc, char **argv)
   ros::Publisher angle_y_pub = nh.advertise<std_msgs::Float32>("/angle/y", 1000);
   ros::Publisher angle_z_pub = nh.advertise<std_msgs::Float32>("/angle/z", 1000);
 
-  rt_task_create(&RT_task1,"KUDOS_tesk",0,90,0);
-  printf("thread_created..\n");
-  rt_task_start(&RT_task1,&kudos_task,NULL);
-  printf("thread_started..\n");
-
   //Thread Setting End
 
-  ros::Rate loop_rate(100);  //100hz = 10ms
+  ros::Rate loop_rate(20);  //100hz = 10ms  //20hz = 50ms
 
   rt.initialize_md_imu_driver();
   rt.Reset_ENC();
@@ -119,18 +114,26 @@ int main(int argc, char **argv)
 
   rt.set_sync_req(false);
 
+  rt.angleY_req();
+
+  //rt.imu_req();
+
+  rt_task_create(&RT_task1,"KUDOS_tesk",0,90,0);
+  printf("thread_created..\n");
+  rt_task_start(&RT_task1,&kudos_task,NULL);
+  printf("thread_started..\n");
+
   struct Encoder_data enc_data;
 
   //md.Encoder_REQ();
-  rt.imu_req();
   loop_rate.sleep();
 
   while (ros::ok())
   {
-    std_msgs::String msg;
-    msg.data = "hello world";
+    //std_msgs::String msg_s;
+    //msg.data = "hello world";
 
-    rt::rpm msg;
+    rt_thread::rpm msg;
     std_msgs::UInt16 status_msg;
 
     msg.r_rpm = r_rpm_g;
@@ -146,7 +149,7 @@ int main(int argc, char **argv)
 
     status_msg.data = 1;
 
-    chatter_pub.publish(msg);
+    //chatter_pub.publish(msg_s);
 
     //present_rpm_pub.publish(msg);
     led_status_pub.publish(status_msg);
@@ -165,26 +168,43 @@ int main(int argc, char **argv)
 void kudos_task(void* arg){
 
   unsigned int count=0;
-  rt_task_set_periodic(NULL, TM_NOW, cycle_ns*10);  //10ms
+  rt_task_set_periodic(NULL, TM_NOW, cycle_ns*10);  //10ms (mininum : 3ms)
+  ROS_INFO("test");
+  int req_num=2;
 
   while (kudos_run){
 
     rt_task_wait_period(NULL);
 
-    rt.imu_read();
+    //rt.imu_read();
+    rt.imuReadOnce();
 
     if(operating_mode == 1){
       rt.send_RPM(r_rpm,l_rpm);
     }
     if(operating_mode == 2 || operating_mode==3 || operating_mode==4){
        rt.contol_vel(vel_arr);
-      //ROS_INFO("Linear_x : %f angular_z : %f",linear_x,angular_z);
+       //ROS_INFO("Linear_x : %f angular_z : %f",vel_arr[0],vel_arr[1]);
     }
 
-    printf("%d\n",count);
-    count++;
-    rt.imu_req();
+    //printf("%d\n",count);
+    //count++;
+    //rt.imu_req();
+
+    if(req_num==1){
+      rt.angleY_req();
+      req_num++;
+    }
+    else if(req_num==2){
+      rt.angleZ_req();
+      req_num++;
+    }
+    else if(req_num==3){
+      rt.gyroZ_req();
+      req_num=1;
+    }
   }
+  //printf("thread_close");
 
 
 }
