@@ -27,7 +27,7 @@ void kudos_task(void* arg);
 void delay(clock_t n);
 
 
-static int operating_mode=2;           //start mode = cmd_vel mode
+static int operating_mode=5;           //start mode = JoyNotUse mode
 
 
 void modeCallback(const std_msgs::Int8::ConstPtr& msg){
@@ -52,6 +52,9 @@ void modeCallback(const std_msgs::Int8::ConstPtr& msg){
     //ROS_INFO("Dymanic cmd_vel mode");
  }
 else if(operating_mode == 4){
+    //ROS_INFO("Dymanic cmd_vel mode");
+ }
+  else if(operating_mode == 5){
     //ROS_INFO("Dymanic cmd_vel mode");
  }
   else
@@ -182,7 +185,7 @@ void kudos_task(void* arg){
     if(operating_mode == 1){
       rt.send_RPM(r_rpm,l_rpm);
     }
-    if(operating_mode == 2 || operating_mode==3 || operating_mode==4){
+    if(operating_mode == 2 || operating_mode==3 || operating_mode==4 ||operating_mode==5){
        rt.contol_vel(vel_arr);
        //ROS_INFO("Linear_x : %f angular_z : %f",vel_arr[0],vel_arr[1]);
     }
