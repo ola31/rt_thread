@@ -20,6 +20,8 @@ double max_time = 0.0;
 float vel_arr[2] = {0,0}; //linear_x, angular_z <global_variable>
 int r_rpm,l_rpm = 0.0;
 
+int comm_not_comming = 0;
+
 /***********************************/
 /************function***************/
 void kudos_task(void* arg);
@@ -72,6 +74,7 @@ void cmd_velCallback(const geometry_msgs::Twist::ConstPtr& msg){
      //rt.contol_vel(vel_arr);
     //ROS_INFO("Linear_x : %f angular_z : %f",linear_x,angular_z);
   }
+  comm_not_comming = 0; //cmd_vel 통신이 들어오면 0으로 초기화 한다.
 }
 
 void rpmCallback(const rt_thread::rpm::ConstPtr& msg){
@@ -186,7 +189,14 @@ void kudos_task(void* arg){
       rt.send_RPM(r_rpm,l_rpm);
     }
     if(operating_mode == 2 || operating_mode==3 || operating_mode==4 ||operating_mode==5){
-       rt.contol_vel(vel_arr);
+      if(comm_not_comming<100){ //1초동안 cmd_vel 통신이 들어오지 않으면 정지한다.
+        rt.contol_vel(vel_arr);
+      }
+      else{
+        vel_arr[2] = {0.0,0.0};
+        rt.contol_vel(vel_arr);
+        ROS_WARN("1초 이상 통신이 연결되지 않아 정지합니다");
+      }
        //ROS_INFO("Linear_x : %f angular_z : %f",vel_arr[0],vel_arr[1]);
     }
 
@@ -206,6 +216,8 @@ void kudos_task(void* arg){
       rt.gyroZ_req();
       req_num=1;
     }
+
+    comm_not_comming++;
   }
   //printf("thread_close");
 
