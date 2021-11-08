@@ -193,7 +193,8 @@ void kudos_task(void* arg){
         rt.contol_vel(vel_arr);
       }
       else{
-        vel_arr[2] = {0.0,0.0};
+        vel_arr[0] = 0.0;
+        vel_arr[1] = 0.0;
         rt.contol_vel(vel_arr);
         ROS_WARN("1초 이상 통신이 연결되지 않아 정지합니다");
       }
