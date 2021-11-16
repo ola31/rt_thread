@@ -98,7 +98,7 @@ class RT_THREAD : public CAN
     void set_sync_req(bool onoff);
     void read_sync_data(void);
 
-    void posi_control(float mot1_rev, float mot2_rev)
+    void posi_control(float mot1_rev, float mot2_rev);
 
     void imu_req(void);
     void imu_read(void);

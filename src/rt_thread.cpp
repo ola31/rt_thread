@@ -173,7 +173,7 @@ void RT_THREAD::contol_vel(float *cmd_vel){
 void RT_THREAD::posi_control(float mot1_rev, float mot2_rev){
 
   //1rec : 1,962,480;
-  int mot1_tick = (int)(mot1_rev*1962480);
+  int mot1_tick = (int)(-1*mot1_rev*1962480);
   int mot2_tick = (int)(mot2_rev*1962480);
 
   BYTE inc_posi_arr1[8]={244,0,0,0,0,0,0,0}; //mot1

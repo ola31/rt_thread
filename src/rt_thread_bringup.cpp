@@ -122,7 +122,15 @@ int main(int argc, char **argv)
 
   rt.angleY_req();
 
-  rt.posi_control(0.25,0.25);
+  rt.posi_control(0.05,0.05);
+  loop_rate.sleep();
+  loop_rate.sleep();
+  loop_rate.sleep();
+  loop_rate.sleep();
+  loop_rate.sleep();
+  loop_rate.sleep();
+  loop_rate.sleep();
+  loop_rate.sleep();
 
   //rt.imu_req();
 
