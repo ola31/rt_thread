@@ -168,6 +168,49 @@ void RT_THREAD::contol_vel(float *cmd_vel){
 }
 
 
+//position control
+//
+void RT_THREAD::posi_control(float mot1_rev, float mot2_rev){
+
+  //1rec : 1,962,480;
+  int mot1_tick = (int)(mot1_rev*1962480);
+  int mot2_tick = (int)(mot2_rev*1962480);
+
+  BYTE inc_posi_arr1[8]={244,0,0,0,0,0,0,0}; //mot1
+  BYTE inc_posi_arr2[8]={251,0,0,0,0,0,0,0}; //mot2
+
+
+  //오른쪽 모터 : 1번모터(D2,D3) ,왼쪽모터 2번 모터(D5,D6)
+  //int8_t D1 =1;         //2ch 제어기는 D1,D4가 0이 아니면 두 채널 모두 구동(??)
+
+  BYTE D1=mot1_tick & 0xff;        //Low data
+  BYTE D2=mot1_tick>>8 & 0xff;     //high data
+  BYTE D3=mot1_tick>>16 & 0xff;
+  BYTE D4=mot1_tick>>24 & 0xff;
+
+  BYTE D11=mot2_tick & 0xff;        //Low data
+  BYTE D22=mot2_tick>>8 & 0xff;     //high data
+  BYTE D33=mot2_tick>>16 & 0xff;
+  BYTE D44=mot2_tick>>24 & 0xff;
+
+
+
+  inc_posi_arr1[1]=D1;
+  inc_posi_arr1[2]=D2;
+  inc_posi_arr1[3]=D3;
+  inc_posi_arr1[4]=D4;
+
+  inc_posi_arr2[1]=D11;
+  inc_posi_arr2[2]=D22;
+  inc_posi_arr2[3]=D33;
+  inc_posi_arr2[4]=D44;
+
+  md_write(inc_posi_arr1);
+  md_write(inc_posi_arr2);
+
+}
+
+
 
 
 

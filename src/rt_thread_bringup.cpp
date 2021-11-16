@@ -122,6 +122,8 @@ int main(int argc, char **argv)
 
   rt.angleY_req();
 
+  rt.posi_control(0.25,0.25);
+
   //rt.imu_req();
 
   rt_task_create(&RT_task1,"KUDOS_tesk",0,90,0);
