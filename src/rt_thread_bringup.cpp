@@ -22,11 +22,21 @@ int r_rpm,l_rpm = 0.0;
 
 int comm_not_comming = 0;
 
+
+
 /***********************************/
 /************function***************/
 void kudos_task(void* arg);
 
-void delay(clock_t n);
+void delay(clock_t n);//PID_control
+double dt = 0.05;
+double pre_error = 0;
+double P_control = 0.0;
+double I_control = 0.0;
+double D_control=0.0;
+double Kp = 1.0;
+double Ki = 1.0;
+double Kd = 1.0;
 
 
 static int operating_mode=5;           //start mode = JoyNotUse mode
@@ -75,6 +85,14 @@ void cmd_velCallback(const geometry_msgs::Twist::ConstPtr& msg){
     //ROS_INFO("Linear_x : %f angular_z : %f",linear_x,angular_z);
   }
   comm_not_comming = 0; //cmd_vel 통신이 들어오면 0으로 초기화 한다.
+
+  double error;
+  error = rt.gyro_z - angular_z;
+  P_control = Kp*error;
+  I_control +=Ki*error*dt;
+  D_control = Kd*(error-pre_error)/dt;
+  angular_z = P_control + I_control + D_control;
+  pre_error = error;
 }
 
 void rpmCallback(const rt_thread::rpm::ConstPtr& msg){
