@@ -120,19 +120,14 @@ int main(int argc, char **argv)
 
   rt.set_sync_req(false);
 
-  rt.set_posi_maxvel(200); //rpm
+  rt.set_posi_maxvel(300); //rpm //1rev - >6s
 
   rt.angleY_req();
 
-  rt.posi_control(0.05,0.05);
-  loop_rate.sleep();
-  loop_rate.sleep();
-  loop_rate.sleep();
-  loop_rate.sleep();
-  loop_rate.sleep();
-  loop_rate.sleep();
-  loop_rate.sleep();
-  loop_rate.sleep();
+  rt.posi_control(-0.5,-0.5);
+for(int m = 0;m<120;m++){
+      loop_rate.sleep();
+}
 
   //rt.imu_req();
 
