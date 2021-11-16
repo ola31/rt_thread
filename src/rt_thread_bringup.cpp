@@ -120,6 +120,8 @@ int main(int argc, char **argv)
 
   rt.set_sync_req(false);
 
+  rt.set_posi_maxvel(200); //rpm
+
   rt.angleY_req();
 
   rt.posi_control(0.05,0.05);

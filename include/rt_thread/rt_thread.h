@@ -99,6 +99,7 @@ class RT_THREAD : public CAN
     void read_sync_data(void);
 
     void posi_control(float mot1_rev, float mot2_rev);
+    void set_posi_maxvel(int max_rpm);
 
     void imu_req(void);
     void imu_read(void);

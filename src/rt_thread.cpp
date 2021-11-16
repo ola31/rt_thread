@@ -210,6 +210,25 @@ void RT_THREAD::posi_control(float mot1_rev, float mot2_rev){
 
 }
 
+void RT_THREAD::set_posi_maxvel(int max_rpm){
+
+  BYTE max_rpm_arr[8]={176,0,0,0,0,0,0,0}; //mot1
+
+
+  //오른쪽 모터 : 1번모터(D2,D3) ,왼쪽모터 2번 모터(D5,D6)
+  //int8_t D1 =1;         //2ch 제어기는 D1,D4가 0이 아니면 두 채널 모두 구동(??)
+
+  BYTE D1=max_rpm & 0xff;        //Low data
+  BYTE D2=max_rpm>>8 & 0xff;     //high data
+
+  max_rpm_arr[1]=D1;
+  max_rpm_arr[2]=D2;
+
+
+  md_write(max_rpm_arr);
+
+}
+
 
 
 
