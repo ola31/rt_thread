@@ -93,7 +93,22 @@ void is_posi_modeCallback(const std_msgs::Bool::ConstPtr& msg){
     rt.is_posi_mode_ = msg->data;
 }
 
+//service
+bool r_theta_go_(rt_thread::r_theta::Request &req, rt_thread::r_theta::Response &res) {
+  // add and save result
+  rt.is_posi_mode_=true;
+  rt.is_posi_mode_=true;
+  rt.is_posi_mode_=true;
 
+  float R = req.r;
+  float Theta = req.theta;
+  rt.move_r_theta(R,Theta);
+  res.result = 0;
+  // print info
+  //ROS_INFO("request: %ld + %ld", (long int)req.a, (long int)req.b);
+  //ROS_INFO("response: %ld", (long int)res.result);
+  return true;
+}
 
 int main(int argc, char **argv)
 {
@@ -113,6 +128,8 @@ int main(int argc, char **argv)
   ros::Publisher gyro_z_pub = nh.advertise<std_msgs::Float32>("/gyro/z", 1000);
   ros::Publisher angle_y_pub = nh.advertise<std_msgs::Float32>("/angle/y", 1000);
   ros::Publisher angle_z_pub = nh.advertise<std_msgs::Float32>("/angle/z", 1000);
+
+  ros::ServiceServer ros_tutorials_service_server = nh.advertiseService("r_theta_go", r_theta_go_);
 
   //Thread Setting End
 

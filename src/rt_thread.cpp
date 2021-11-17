@@ -246,6 +246,24 @@ void RT_THREAD::angle_turn(float deg){
 }
 
 
+void RT_THREAD::go_foward(float meter){
+   float rev=0.0;
+   rev = meter / (2*PI*wheel_radius);
+   posi_control(rev,rev);
+   float delay_time = 0.0;
+   delay_time = rev/(300/30/60);  //(600 rpm/30/60sec) = 1/6 rps
+   delay(delay_time+2);
+}
+
+void RT_THREAD::move_r_theta(float r, float theta){  //r : meter, theta : radian
+  float deg = RAD_2_DEG(theta);
+  angle_turn(deg);
+  sleep(0.3);
+  go_foward(r);
+  sleep(0.3);
+}
+
+
 
 
 

@@ -9,6 +9,7 @@
 #include "std_msgs/Bool.h"
 #include "geometry_msgs/Twist.h"
 #include "rt_thread/rpm.h"
+#include "rt_thread/r_theta.h"
 
 #include<sys/mman.h>
 #include <signal.h>
@@ -44,7 +45,8 @@
 #define wheel_radius 0.150
 
 
-#define DEG_2_RAD(value) (3.141592/180)*value
+#define DEG_2_RAD(value) (3.141592/180.0)*value
+#define RAD_2_DEG(value) (180.0/3.141592)*value
 #define G 9.80665
 
 
@@ -104,6 +106,8 @@ class RT_THREAD : public CAN
     void posi_control(float mot1_rev, float mot2_rev);
     void set_posi_maxvel(int max_rpm);
     void angle_turn(float deg);
+    void go_foward(float meter);
+    void move_r_theta(float r, float theta);
 
     void imu_req(void);
     void imu_read(void);
