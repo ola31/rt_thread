@@ -229,6 +229,21 @@ void RT_THREAD::set_posi_maxvel(int max_rpm){
 
 }
 
+void RT_THREAD::angle_turn(float deg){
+
+  float goal_angle = angle_z+deg;
+  float angular_z = 0.0;
+  while(1){
+    if(abs(goal_angle - angle_z)<5.0) break;
+
+    angular_z = 0.05*(goal_angle - angle_z);
+    float vel_arr[2] = {0.0,0.0};
+    vel_arr[0] = 0.0;
+    vel_arr[1] = angular_z;
+    rt.contol_vel(vel_arr);
+  }
+}
+
 
 
 

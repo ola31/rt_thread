@@ -6,6 +6,7 @@
 #include "std_msgs/Int8.h"
 #include "std_msgs/UInt16.h"
 #include "std_msgs/Float32.h"
+#include "std_msgs/Bool.h"
 #include "geometry_msgs/Twist.h"
 #include "rt_thread/rpm.h"
 
@@ -79,6 +80,8 @@ class RT_THREAD : public CAN
     float angle_y = 0.0;
     float angle_z = 0.0;
 
+    bool is_posi_mode_ = false;
+
     void initialize_md_imu_driver(void);
     void md_write(BYTE data_array[]);
     void imu_write(BYTE data_array[]);
@@ -100,6 +103,7 @@ class RT_THREAD : public CAN
 
     void posi_control(float mot1_rev, float mot2_rev);
     void set_posi_maxvel(int max_rpm);
+    void angle_turn(float deg);
 
     void imu_req(void);
     void imu_read(void);

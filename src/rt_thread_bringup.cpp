@@ -89,6 +89,12 @@ void rpmCallback(const rt_thread::rpm::ConstPtr& msg){
 
 }
 
+void is_posi_modeCallback(const std_msgs::Bool::ConstPtr& msg){
+    rt.is_posi_mode_ = msg->data;
+}
+
+
+
 int main(int argc, char **argv)
 {
   ros::init(argc, argv, "rt_thread_node");
@@ -100,6 +106,7 @@ int main(int argc, char **argv)
   ros::Subscriber mode_sub = nh.subscribe("/mode", 1000, modeCallback);
   ros::Subscriber cmd_vel_sub = nh.subscribe("/cmd_vel", 1000, cmd_velCallback);
   ros::Subscriber rpm_sub = nh.subscribe("/rpm", 1000, rpmCallback);
+  ros::Subscriber is_posi_mode_sub = nh.subscribe("/is_posi_mode", 1000, is_posi_modeCallback);
 
 
   ros::Publisher angle_pub = nh.advertise<std_msgs::Float32>("/angle/x", 1000);
@@ -124,7 +131,8 @@ int main(int argc, char **argv)
 
   rt.angleY_req();
 
-  rt.posi_control(-0.5,-0.5);
+  //rt.posi_control(-0.5,-0.5);
+  rt.angle_turn(3);
 for(int m = 0;m<120;m++){
       loop_rate.sleep();
 }
@@ -197,7 +205,12 @@ void kudos_task(void* arg){
     }
     if(operating_mode == 2 || operating_mode==3 || operating_mode==4 ||operating_mode==5){
       if(comm_not_comming<100){ //1초동안 cmd_vel 통신이 들어오지 않으면 정지한다.
-        rt.contol_vel(vel_arr);
+        if(rt.is_posi_mode_ == false){
+           rt.contol_vel(vel_arr);
+        }
+        else{
+          ROS_ERROR("cmd_vel in POSI_mode will not work");
+        }
       }
       else{
         vel_arr[0] = 0.0;
