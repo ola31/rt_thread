@@ -132,10 +132,7 @@ int main(int argc, char **argv)
   rt.angleY_req();
 
   //rt.posi_control(-0.5,-0.5);
-  rt.angle_turn(3);
-for(int m = 0;m<120;m++){
-      loop_rate.sleep();
-}
+
 
   //rt.imu_req();
 
@@ -143,6 +140,8 @@ for(int m = 0;m<120;m++){
   printf("thread_created..\n");
   rt_task_start(&RT_task1,&kudos_task,NULL);
   printf("thread_started..\n");
+  sleep(1);
+  rt.angle_turn(-20);
 
   struct Encoder_data enc_data;
 
