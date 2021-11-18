@@ -33,6 +33,7 @@ static int operating_mode=5;           //start mode = JoyNotUse mode
 
 
 void modeCallback(const std_msgs::Int8::ConstPtr& msg){
+  ROS_INFO("callback2");
 
   if(operating_mode != msg->data){
     rt.Torque_OFF();
@@ -64,6 +65,7 @@ else if(operating_mode == 4){
 }
 
 void cmd_velCallback(const geometry_msgs::Twist::ConstPtr& msg){
+  ROS_INFO("callback1");
 
   float linear_x = msg->linear.x;
   float angular_z = msg->angular.z;
@@ -95,6 +97,8 @@ void is_posi_modeCallback(const std_msgs::Bool::ConstPtr& msg){
 
 //service
 bool r_theta_go_(rt_thread::r_theta::Request &req, rt_thread::r_theta::Response &res) {
+
+  ROS_INFO("sevice");
   // add and save result
   rt.is_posi_mode_=true;
   rt.is_posi_mode_=true;
@@ -103,7 +107,7 @@ bool r_theta_go_(rt_thread::r_theta::Request &req, rt_thread::r_theta::Response 
   float R = req.r;
   float Theta = req.theta;
   rt.move_r_theta(R,Theta);
-  res.result = 0;
+  res.result = 1.0;
   // print info
   //ROS_INFO("request: %ld + %ld", (long int)req.a, (long int)req.b);
   //ROS_INFO("response: %ld", (long int)res.result);
@@ -136,7 +140,7 @@ int main(int argc, char **argv)
   ros::Rate loop_rate(20);  //100hz = 10ms  //20hz = 50ms
 
   rt.initialize_md_imu_driver();
-  rt.Reset_ENC();
+ // rt.Reset_ENC(); ////////
 
   //rt.set_sync_tx_cycle(5);  //10ms = 100hz
   //rt.save_params();
@@ -157,8 +161,26 @@ int main(int argc, char **argv)
   printf("thread_created..\n");
   rt_task_start(&RT_task1,&kudos_task,NULL);
   printf("thread_started..\n");
-  sleep(1);
-  rt.angle_turn(-20);
+
+  usleep(100000); //0.1ms
+
+ //rt.angle_turn(10);
+ //rt.angle_turn(-10);
+ // rt.angle_turn(0);
+
+  //vel_arr[0] = 0.0;
+  //vel_arr[1] = 0.1;
+ // rt.contol_vel(vel_arr);
+ // sleep(1);
+ // vel_arr[0] = 0.0;
+ // vel_arr[1] = 0.0;
+ // rt.contol_vel(vel_arr);
+
+  ROS_INFO("vel zero");
+  //rt.move_r_theta(-0.1,0.1);
+  //rt.go_foward(0.1);
+ // sleep(1);
+  //rt.posi_control(0.1,0.1);
 
   struct Encoder_data enc_data;
 
@@ -209,12 +231,17 @@ void kudos_task(void* arg){
   ROS_INFO("test");
   int req_num=2;
 
+  struct Encoder_data enc_data_;
+
   while (kudos_run){
 
     rt_task_wait_period(NULL);
 
     //rt.imu_read();
     rt.imuReadOnce();
+//    enc_data_ = rt.read_Encoder();
+
+//    ROS_INFO("r_posi : %d l_posi : %d",enc_data_.R_posi,enc_data_.L_posi);
 
     if(operating_mode == 1){
       rt.send_RPM(r_rpm,l_rpm);
@@ -225,14 +252,16 @@ void kudos_task(void* arg){
            rt.contol_vel(vel_arr);
         }
         else{
-          ROS_ERROR("cmd_vel in POSI_mode will not work");
+          ROS_INFO("is_posi_control_mode");
         }
       }
       else{
+        if(rt.is_posi_mode_ == false){
         vel_arr[0] = 0.0;
         vel_arr[1] = 0.0;
         rt.contol_vel(vel_arr);
-        ROS_WARN("STOP because cmd_vel is not recieved for more than 1 sec.");
+        //ROS_WARN("STOP because cmd_vel is not recieved for more than 1 sec.");
+        }
       }
        //ROS_INFO("Linear_x : %f angular_z : %f",vel_arr[0],vel_arr[1]);
     }
@@ -240,6 +269,7 @@ void kudos_task(void* arg){
     //printf("%d\n",count);
     //count++;
     //rt.imu_req();
+   // rt.Encoder_REQ();
 
     if(req_num==1){
       rt.angleY_req();

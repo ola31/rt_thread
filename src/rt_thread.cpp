@@ -157,6 +157,7 @@ void RT_THREAD::Reset_ENC(void){
 void RT_THREAD::contol_vel(float *cmd_vel){
   float lin_vel = cmd_vel[LINEAR];
   float ang_vel = cmd_vel[ANGULAR];
+  //ROS_INFO("lin_x : %f, ang_z : %f",lin_vel,ang_vel);
 
   short R_wheel_RPM=0,L_wheel_RPM=0;  //signed 16 bit
 
@@ -172,12 +173,18 @@ void RT_THREAD::contol_vel(float *cmd_vel){
 //
 void RT_THREAD::posi_control(float mot1_rev, float mot2_rev){
 
+  ROS_WARN("aaaaaa");
+
   //1rec : 1,962,480;
+  Reset_ENC();
   int mot1_tick = (int)(-1*mot1_rev*1962480);
   int mot2_tick = (int)(mot2_rev*1962480);
 
-  BYTE inc_posi_arr1[8]={244,0,0,0,0,0,0,0}; //mot1
+ BYTE inc_posi_arr1[8]={244,0,0,0,0,0,0,0}; //mot1
   BYTE inc_posi_arr2[8]={251,0,0,0,0,0,0,0}; //mot2
+
+ //  BYTE inc_posi_arr1[8]={219,0,0,0,0,0,0,0}; //mot1
+ //  BYTE inc_posi_arr2[8]={236,0,0,0,0,0,0,0}; //mot2
 
 
   //오른쪽 모터 : 1번모터(D2,D3) ,왼쪽모터 2번 모터(D5,D6)
@@ -188,25 +195,37 @@ void RT_THREAD::posi_control(float mot1_rev, float mot2_rev){
   BYTE D3=mot1_tick>>16 & 0xff;
   BYTE D4=mot1_tick>>24 & 0xff;
 
+ // BYTE D5=(300) &0xff;
+ // BYTE D6 = (300)>>8 & 0xff;
+
   BYTE D11=mot2_tick & 0xff;        //Low data
   BYTE D22=mot2_tick>>8 & 0xff;     //high data
   BYTE D33=mot2_tick>>16 & 0xff;
   BYTE D44=mot2_tick>>24 & 0xff;
-
+ // BYTE D55=(300)&0xff;
+ // BYTE D66 = (300)>>8 & 0xff;
 
 
   inc_posi_arr1[1]=D1;
   inc_posi_arr1[2]=D2;
   inc_posi_arr1[3]=D3;
   inc_posi_arr1[4]=D4;
+ // inc_posi_arr1[5]=D5;
+  //inc_posi_arr1[6]=D6;
 
   inc_posi_arr2[1]=D11;
   inc_posi_arr2[2]=D22;
   inc_posi_arr2[3]=D33;
   inc_posi_arr2[4]=D44;
+ // inc_posi_arr2[5]=D55;
+ // inc_posi_arr2[6]=D66;
 
-  md_write(inc_posi_arr1);
   md_write(inc_posi_arr2);
+  //ROS_ERROR("AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA");
+  usleep(3000); //3ms
+  md_write(inc_posi_arr1);
+ // ROS_ERROR("BBBBBBBBBBbBBBBBBBBBBBBBBBBBBBBB");
+
 
 }
 
@@ -233,34 +252,65 @@ void RT_THREAD::angle_turn(float deg){
 
   float goal_angle = angle_z+deg;
   float angular_z = 0.0;
+  float vel_arr_[2] = {0.0,0.0};
   while(1){
-    if(abs(goal_angle - angle_z)<1.0) break;
+    //ROS_INFO("goal : %f, present : %f",goal_angle, angle_z);
+    if(abs(goal_angle - angle_z)<0.5) {
+      vel_arr_[0] = 0.0;
+      vel_arr_[1] = 0.0;
+      contol_vel(vel_arr_);
+      usleep(1000); //1ms
+      break;
+    }
 
-    angular_z = 0.05*(goal_angle - angle_z);
-    float vel_arr[2] = {0.0,0.0};
-    vel_arr[0] = 0.0;
-    vel_arr[1] = angular_z;
-    contol_vel(vel_arr);
-    sleep(0.01);
+    angular_z = 0.03*(goal_angle - angle_z);
+    //float vel_arr[2] = {0.0,0.0};
+    vel_arr_[0] = 0.0;
+    vel_arr_[1] = angular_z;
+    contol_vel(vel_arr_);
+    usleep(50000); //50ms
   }
+  ROS_INFO("angle_turn_done");
+  /*
+  vel_arr_[0] = 0.0;
+  vel_arr_[1] = 0.0;
+  contol_vel(vel_arr_);
+  sleep(0.05);
+  contol_vel(vel_arr_);
+  sleep(0.05);
+  contol_vel(vel_arr_);
+  sleep(0.05);
+  contol_vel(vel_arr_);
+  sleep(0.05);*/
+  //ROS_INFO("angle turn done!");
+
 }
 
 
 void RT_THREAD::go_foward(float meter){
    float rev=0.0;
-   rev = meter / (2*PI*wheel_radius);
+   rev = meter / (2.0*PI*wheel_radius);
+   //rev *=30.0;
    posi_control(rev,rev);
    float delay_time = 0.0;
-   delay_time = rev/(300/30/60);  //(600 rpm/30/60sec) = 1/6 rps
-   delay(delay_time+2);
+   delay_time = (abs(rev)*30.0)/(300.0/60.0);  //(600 rpm/30/60sec) = 1/6 rps
+   int delay_usec = delay_time * 1000000; //sec->usec
+   //ROS_INFO("usec : %d",delay_usec);
+   usleep(delay_usec+50000); //+50ms
+   //ROS_INFO("rev : %f , sleep time : %f",rev,delay_time);
+   ROS_INFO("go_foward_done");
 }
 
 void RT_THREAD::move_r_theta(float r, float theta){  //r : meter, theta : radian
   float deg = RAD_2_DEG(theta);
+  ROS_INFO("deg : %f",deg);
   angle_turn(deg);
-  sleep(0.3);
+  //ROS_INFO("aaa");
+  usleep(50000); //50ms
   go_foward(r);
-  sleep(0.3);
+  //ROS_INFO("bbb");
+  usleep(50000);
+  ROS_INFO("move_r_theta_done");
 }
 
 

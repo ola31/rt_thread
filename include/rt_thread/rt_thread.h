@@ -42,7 +42,7 @@
 #define PI 3.141593
 
 #define wheel_separation 0.470
-#define wheel_radius 0.150
+#define wheel_radius 0.075 //0.150
 
 
 #define DEG_2_RAD(value) (3.141592/180.0)*value
@@ -82,7 +82,7 @@ class RT_THREAD : public CAN
     float angle_y = 0.0;
     float angle_z = 0.0;
 
-    bool is_posi_mode_ = false;
+    bool is_posi_mode_ = true;
 
     void initialize_md_imu_driver(void);
     void md_write(BYTE data_array[]);
