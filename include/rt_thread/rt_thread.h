@@ -83,7 +83,7 @@ class RT_THREAD : public CAN
     float angle_y = 0.0;
     float angle_z = 0.0;
 
-    bool is_posi_mode_ = true;
+    bool is_posi_mode_ = false;
 
     void initialize_md_imu_driver(void);
     void md_write(BYTE data_array[]);
