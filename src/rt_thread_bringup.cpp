@@ -65,7 +65,7 @@ else if(operating_mode == 4){
 }
 
 void cmd_velCallback(const geometry_msgs::Twist::ConstPtr& msg){
-  ROS_INFO("callback1");
+ // ROS_INFO("callback1");
 
   float linear_x = msg->linear.x;
   float angular_z = msg->angular.z;

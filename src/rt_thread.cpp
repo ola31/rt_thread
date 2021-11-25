@@ -255,7 +255,7 @@ void RT_THREAD::angle_turn(float deg){
   float vel_arr_[2] = {0.0,0.0};
   while(1){
     //ROS_INFO("goal : %f, present : %f",goal_angle, angle_z);
-    if(abs(goal_angle - angle_z)<0.5) {
+    if(abs(goal_angle - angle_z)<0.8) {
       vel_arr_[0] = 0.0;
       vel_arr_[1] = 0.0;
       contol_vel(vel_arr_);
