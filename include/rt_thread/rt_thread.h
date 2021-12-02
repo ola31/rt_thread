@@ -10,7 +10,7 @@
 #include "geometry_msgs/Twist.h"
 #include "rt_thread/rpm.h"
 #include "rt_thread/r_theta.h"
-#include "tr_thread/set_imu_zero.h"
+#include "rt_thread/set_imu_zero.h"
 //#include "rt_msgs/r_theta.h"
 
 #include<sys/mman.h>
