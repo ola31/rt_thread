@@ -1,0 +1,3 @@
+<launch>
+    <node pkg="rt_thread" type="rt_thread_node" name="rt_thread_node" output="screen"/>
+</launch>
