@@ -118,7 +118,7 @@ bool set_imu_angle_zero_(rt_thread::set_imu_zero::Request &req, rt_thread::set_i
   int num = req.meaningless_number;
   rt.set_imu_angle_zero();
   res.result = 1;
-  return true
+  return true;
 
 }
 int main(int argc, char **argv)
