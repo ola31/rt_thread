@@ -65,6 +65,7 @@ find_package(catkin REQUIRED COMPONENTS
  add_service_files(
    FILES
    r_theta.srv
+   set_imu_zero.srv
 #   Service2.srv
  )
 

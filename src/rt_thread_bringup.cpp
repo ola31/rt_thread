@@ -114,6 +114,13 @@ bool r_theta_go_(rt_thread::r_theta::Request &req, rt_thread::r_theta::Response 
   return true;
 }
 
+bool set_imu_angle_zero_(rt_thread::set_imu_zero::Request &req, rt_thread::set_imu_zero::Response &res){
+  int num = req.meaningless_number;
+  rt.set_imu_angle_zero();
+  res.result = 1;
+  return true
+
+}
 int main(int argc, char **argv)
 {
   ros::init(argc, argv, "rt_thread_node");
@@ -134,13 +141,14 @@ int main(int argc, char **argv)
   ros::Publisher angle_z_pub = nh.advertise<std_msgs::Float32>("/angle/z", 1000);
 
   ros::ServiceServer ros_tutorials_service_server = nh.advertiseService("r_theta_go", r_theta_go_);
+  ros::ServiceServer set_imu_angle_zero_service_server = nh.advertiseService("set_imu_angle_zero", set_imu_angle_zero_);
 
   //Thread Setting End
 
   ros::Rate loop_rate(20);  //100hz = 10ms  //20hz = 50ms
 
   rt.initialize_md_imu_driver();
- // rt.Reset_ENC(); ////////
+  rt.Reset_ENC(); ////////
 
   //rt.set_sync_tx_cycle(5);  //10ms = 100hz
   //rt.save_params();
