@@ -10,6 +10,7 @@
 #include "geometry_msgs/Twist.h"
 #include "rt_thread/rpm.h"
 #include "rt_thread/r_theta.h"
+#include "tr_thread/set_imu_zero.h"
 //#include "rt_msgs/r_theta.h"
 
 #include<sys/mman.h>
@@ -103,6 +104,7 @@ class RT_THREAD : public CAN
     void set_sync_tx_cycle(int cycle_num);
     void set_sync_req(bool onoff);
     void read_sync_data(void);
+    void set_imu_angle_zero(void);
 
     void posi_control(float mot1_rev, float mot2_rev);
     void set_posi_maxvel(int max_rpm);

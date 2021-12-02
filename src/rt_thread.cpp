@@ -354,6 +354,10 @@ void RT_THREAD::cmd(int cmd_num){
   imu_write(cmd_arr);
 }
 
+void RT_THREAD::set_imu_angle_zero(void){
+  cmd(5); //오일러 각도를 0으로 리셋
+}
+
 void RT_THREAD::save_params(void){
   cmd(1);
   /*
