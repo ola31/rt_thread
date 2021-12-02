@@ -148,7 +148,7 @@ int main(int argc, char **argv)
 
   rt.set_sync_req(false);
 
-  rt.set_posi_maxvel(300); //rpm //1rev - >6s
+  rt.set_posi_maxvel(350);//300 //rpm //1rev - >6s
 
   rt.angleY_req();
 

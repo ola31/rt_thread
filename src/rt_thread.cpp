@@ -263,7 +263,7 @@ void RT_THREAD::angle_turn(float deg){
       break;
     }
 
-    angular_z = 0.03*(goal_angle - angle_z);
+    angular_z = 0.045*(goal_angle - angle_z);//0.03
     //float vel_arr[2] = {0.0,0.0};
     vel_arr_[0] = 0.0;
     vel_arr_[1] = angular_z;
