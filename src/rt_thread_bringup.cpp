@@ -136,9 +136,9 @@ int main(int argc, char **argv)
 
 
   ros::Publisher angle_pub = nh.advertise<std_msgs::Float32>("/angle/x", 1000);
-  ros::Publisher gyro_z_pub = nh.advertise<std_msgs::Float32>("/gyro/z", 1000);
-  ros::Publisher angle_y_pub = nh.advertise<std_msgs::Float32>("/angle/y", 1000);
-  ros::Publisher angle_z_pub = nh.advertise<std_msgs::Float32>("/angle/z", 1000);
+  ros::Publisher gyro_z_pub = nh.advertise<std_msgs::Float32>("/gyro/z", 10);
+  ros::Publisher angle_y_pub = nh.advertise<std_msgs::Float32>("/angle/y", 10);
+  ros::Publisher angle_z_pub = nh.advertise<std_msgs::Float32>("/angle/z", 10);
 
   ros::ServiceServer ros_tutorials_service_server = nh.advertiseService("r_theta_go", r_theta_go_);
   ros::ServiceServer set_imu_angle_zero_service_server = nh.advertiseService("set_imu_angle_zero", set_imu_angle_zero_);
