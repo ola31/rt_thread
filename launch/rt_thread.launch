@@ -1,3 +1,4 @@
 <launch>
     <node pkg="rt_thread" type="rt_thread_node" name="rt_thread_node" output="screen"/>
+    <node pkg="back_hand_controller" type="back_hand_controller_node" name="back_hand_controller_node" output="screen"/>
 </launch>
